@@ -1,0 +1,36 @@
+// This is a base64 encoded default avatar PNG image
+// It's a simple placeholder profile image with a gradient background
+
+// Since we can't directly create a binary file, you'll need to:
+// 1. Create a simple avatar image
+// 2. Save it as public/default-avatar.png in your project folder
+// 3. Make sure it's a 200x200px image for optimal display
+
+// Example code to use instead if you want to generate a simple avatar programmatically:
+/*
+import { createCanvas } from 'canvas';
+
+const canvas = createCanvas(200, 200);
+const ctx = canvas.getContext('2d');
+
+// Create gradient background
+const gradient = ctx.createLinearGradient(0, 0, 200, 200);
+gradient.addColorStop(0, '#0ea5e9');
+gradient.addColorStop(1, '#3b82f6');
+ctx.fillStyle = gradient;
+ctx.fillRect(0, 0, 200, 200);
+
+// Add a simple user icon
+ctx.fillStyle = '#ffffff';
+ctx.beginPath();
+ctx.arc(100, 80, 40, 0, Math.PI * 2, true);
+ctx.fill();
+ctx.beginPath();
+ctx.arc(100, 180, 60, Math.PI, Math.PI * 2, false);
+ctx.fill();
+
+const fs = require('fs');
+const out = fs.createWriteStream(__dirname + '/default-avatar.png');
+const stream = canvas.createPNGStream();
+stream.pipe(out);
+*/ 

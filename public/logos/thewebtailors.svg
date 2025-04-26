@@ -1,0 +1,15 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="200" height="200" rx="30" fill="#0ea5e9"/>
+  <text 
+    x="50%" 
+    y="50%" 
+    font-family="Arial, sans-serif" 
+    font-weight="bold" 
+    font-size="80" 
+    fill="#ffffff" 
+    dominant-baseline="middle" 
+    text-anchor="middle"
+  >
+    TW
+  </text>
+</svg> 
