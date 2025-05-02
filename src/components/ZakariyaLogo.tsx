@@ -1,0 +1,41 @@
+import React from 'react';
+
+interface ZakariyaLogoProps {
+  width?: number;
+  height?: number;
+  className?: string;
+}
+
+export default function ZakariyaLogo({ width = 200, height = 200, className = '' }: ZakariyaLogoProps) {
+  return (
+    <svg
+      width={width}
+      height={height}
+      viewBox="0 0 200 200"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+    >
+      {/* Outer circle with gradient */}
+      <circle cx="100" cy="100" r="100" fill="url(#zakariya-gradient)" />
+      
+      {/* Inner black circle */}
+      <circle cx="100" cy="100" r="70" fill="black" />
+      
+      {/* "Z" letter */}
+      <path
+        d="M67 68H133V86L95 118H133V136H67V118L105 86H67V68Z"
+        fill="white"
+      />
+      
+      {/* Define the gradient */}
+      <defs>
+        <linearGradient id="zakariya-gradient" x1="0" y1="0" x2="200" y2="200" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stopColor="#1E40AF" />
+          <stop offset="0.5" stopColor="#4F46E5" />
+          <stop offset="1" stopColor="#8B5CF6" />
+        </linearGradient>
+      </defs>
+    </svg>
+  );
+} 

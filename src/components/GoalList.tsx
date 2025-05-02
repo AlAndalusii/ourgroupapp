@@ -77,11 +77,18 @@ export default function GoalList({ goals, title, description, showScores = false
                 </div>
                 <div className="flex-1">
                   <div className="flex justify-between">
-                    <h3 className={`text-lg font-semibold ${
-                      goal.completed ? 'text-success-700 dark:text-success-400' : 'text-gray-800 dark:text-white'
-                    }`}>
-                      {goal.title}
-                    </h3>
+                    <div>
+                      <h3 className={`text-lg font-semibold ${
+                        goal.completed ? 'text-success-700 dark:text-success-400' : 'text-gray-800 dark:text-white'
+                      }`}>
+                        {goal.title}
+                      </h3>
+                      {goal.description && (
+                        <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400 inline-block mt-1">
+                          {goal.description}
+                        </span>
+                      )}
+                    </div>
                     <div className="flex space-x-1">
                       {goal.isOptional && (
                         <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 flex items-center">
@@ -101,9 +108,6 @@ export default function GoalList({ goals, title, description, showScores = false
                       )}
                     </div>
                   </div>
-                  <p className="text-gray-600 dark:text-gray-400 mt-2 text-sm">
-                    {goal.description}
-                  </p>
                   {showScores && goal.score !== undefined && (
                     <div className="mt-3">
                       <div className={`inline-block text-sm font-medium rounded-full px-3 py-1 ${

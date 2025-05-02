@@ -1,30 +1,24 @@
 'use client';
 
 import { useState } from 'react';
+import { Goal, MonthlyGoal } from '@/types';
+import { saveMonthlyGoals, saveYearlyGoals, getUserData, getCurrentMonth } from '@/utils/storage';
 
 interface GoalFormProps {
   userId: number;
-  existingGoal?: {
-    id: number;
-    title: string;
-    description: string;
-    month?: string;
-    isOptional?: boolean;
-    score?: number;
-    completed?: boolean;
-  };
+  existingGoal?: Goal | MonthlyGoal;
   onClose?: () => void;
-  onSave?: (updatedGoal: any) => void;
+  onSave?: (updatedGoal: Goal | MonthlyGoal) => void;
 }
 
 export default function GoalForm({ userId, existingGoal, onClose, onSave }: GoalFormProps) {
   const [formData, setFormData] = useState({
     title: existingGoal?.title || '',
     description: existingGoal?.description || '',
-    month: existingGoal?.month || '',
-    goalType: existingGoal?.month ? 'monthly' : 'yearly',
+    month: 'month' in (existingGoal || {}) ? (existingGoal as MonthlyGoal).month : getCurrentMonth(),
+    goalType: 'month' in (existingGoal || {}) ? 'monthly' : 'yearly',
     isOptional: existingGoal?.isOptional || false,
-    score: existingGoal?.score || 0,
+    score: 'score' in (existingGoal || {}) ? (existingGoal as MonthlyGoal).score : 0,
     completed: existingGoal?.completed || false,
   });
   
@@ -62,29 +56,73 @@ export default function GoalForm({ userId, existingGoal, onClose, onSave }: Goal
       return;
     }
     
-    // Simulate API call with delay
+    // Small delay to simulate processing
     setTimeout(() => {
       try {
-        // Prepare the updated goal object
-        const updatedGoal = {
-          id: existingGoal?.id || Date.now(), // Use existing ID or generate a new one
-          title: formData.title,
-          description: formData.description,
-          completed: formData.completed,
-          ...(formData.goalType === 'monthly' ? {
+        // Get current user data
+        const userData = getUserData(userId);
+        if (!userData) {
+          setErrorMessage('Failed to load user data');
+          setIsSubmitting(false);
+          return;
+        }
+        
+        if (formData.goalType === 'monthly') {
+          // Prepare the monthly goal object
+          const monthlyGoal: MonthlyGoal = {
+            id: existingGoal?.id || Date.now(),
+            title: formData.title,
+            description: formData.description,
+            completed: formData.completed,
             month: formData.month,
             score: formData.score
-          } : {
+          };
+          
+          // Get the current goals for the selected month
+          const currentMonthlyGoals = userData.monthlyGoals[formData.month] || [];
+          
+          if (existingGoal) {
+            // Update existing monthly goal
+            const updatedGoals = currentMonthlyGoals.map(goal => 
+              goal.id === monthlyGoal.id ? monthlyGoal : goal
+            );
+            saveMonthlyGoals(userId, formData.month, updatedGoals);
+          } else {
+            // Add new monthly goal
+            const updatedGoals = [...currentMonthlyGoals, monthlyGoal];
+            saveMonthlyGoals(userId, formData.month, updatedGoals);
+          }
+          
+          // Call the onSave callback if provided
+          if (onSave) {
+            onSave(monthlyGoal);
+          }
+        } else {
+          // Prepare the yearly goal object
+          const yearlyGoal: Goal = {
+            id: existingGoal?.id || Date.now(),
+            title: formData.title,
+            description: formData.description,
+            completed: formData.completed,
             isOptional: formData.isOptional
-          })
-        };
-        
-        // In a real app, you would save this to a database
-        console.log('Goal for user', userId, existingGoal ? 'updated' : 'added', updatedGoal);
-        
-        // Call the onSave callback if provided
-        if (onSave) {
-          onSave(updatedGoal);
+          };
+          
+          if (existingGoal) {
+            // Update existing yearly goal
+            const updatedGoals = userData.yearlyGoals.map(goal => 
+              goal.id === yearlyGoal.id ? yearlyGoal : goal
+            );
+            saveYearlyGoals(userId, updatedGoals);
+          } else {
+            // Add new yearly goal
+            const updatedGoals = [...userData.yearlyGoals, yearlyGoal];
+            saveYearlyGoals(userId, updatedGoals);
+          }
+          
+          // Call the onSave callback if provided
+          if (onSave) {
+            onSave(yearlyGoal);
+          }
         }
         
         // Show success message
@@ -96,7 +134,7 @@ export default function GoalForm({ userId, existingGoal, onClose, onSave }: Goal
           setFormData({
             title: '',
             description: '',
-            month: '',
+            month: getCurrentMonth(),
             goalType: 'monthly',
             isOptional: false,
             score: 0,
@@ -112,6 +150,7 @@ export default function GoalForm({ userId, existingGoal, onClose, onSave }: Goal
         }
       } catch (error) {
         setErrorMessage('An error occurred. Please try again.');
+        console.error('Error saving goal:', error);
       } finally {
         setIsSubmitting(false);
         
@@ -248,17 +287,29 @@ export default function GoalForm({ userId, existingGoal, onClose, onSave }: Goal
           
           <div>
             <label htmlFor="description" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-              Description
+              {formData.goalType === 'yearly' ? 'Category' : 'Description'}
             </label>
-            <textarea
-              id="description"
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              rows={3}
-              className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-500 focus:ring-opacity-50 bg-white dark:bg-gray-800 dark:text-gray-200 transition duration-200"
-              placeholder="Enter goal description"
-            ></textarea>
+            {formData.goalType === 'yearly' ? (
+              <input
+                type="text"
+                id="description"
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-500 focus:ring-opacity-50 bg-white dark:bg-gray-800 dark:text-gray-200 transition duration-200"
+                placeholder="Enter category (e.g., Quran, Business, Gym)"
+              />
+            ) : (
+              <textarea
+                id="description"
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                rows={3}
+                className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-500 focus:ring-opacity-50 bg-white dark:bg-gray-800 dark:text-gray-200 transition duration-200"
+                placeholder="Enter goal description"
+              ></textarea>
+            )}
           </div>
           
           {formData.goalType === 'monthly' && (

@@ -8,7 +8,7 @@ interface User {
 
 interface UserSelectorProps {
   users: User[];
-  selectedUserId: number;
+  selectedUserId: number | null;
   onSelectUser: (userId: number) => void;
 }
 
@@ -28,7 +28,9 @@ export default function UserSelector({
     setIsOpen(false);
   };
 
-  const selectedUser = users.find(user => user.id === selectedUserId);
+  const selectedUser = selectedUserId !== null 
+    ? users.find(user => user.id === selectedUserId) 
+    : null;
 
   const getUserAvatarColor = () => {
     return "bg-primary-500";
@@ -43,7 +45,7 @@ export default function UserSelector({
         aria-haspopup="true"
       >
         <div className={`w-8 h-8 rounded-full text-white flex items-center justify-center poppins-medium ${getUserAvatarColor()}`}>
-          {selectedUser?.name.charAt(0)}
+          {selectedUser?.name.charAt(0) || '?'}
         </div>
         <span>
           {selectedUser?.name || 'Select User'}

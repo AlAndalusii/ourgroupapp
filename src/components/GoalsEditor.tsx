@@ -362,14 +362,14 @@ export default function GoalsEditor({ userId, monthlyGoals, yearlyGoals, onSave,
                         
                         <div>
                           <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                            Description
+                            Category
                           </label>
-                          <textarea
+                          <input
+                            type="text"
                             value={goal.description}
                             onChange={(e) => handleYearlyGoalChange(index, 'description', e.target.value)}
                             className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                            placeholder="Enter goal description"
-                            rows={3}
+                            placeholder="Enter category (e.g., Quran, Business, Gym)"
                           />
                         </div>
                         

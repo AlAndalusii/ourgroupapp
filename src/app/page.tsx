@@ -4,6 +4,143 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import Logo from '@/components/Logo';
+import AOS from 'aos';
+import { initializeUserDataIfNeeded } from '@/utils/storage';
+import { UserData } from '@/types';
+
+// Initialize sample data for 3 users
+const initializeAppData = () => {
+  const sampleData: Record<number, UserData> = {
+    1: {
+      userId: 1,
+      yearlyGoals: [
+        { id: 1, title: 'Quran: Memorised Ten Juzz', description: 'Memorised Ten Juzz', completed: false },
+        { id: 2, title: 'Arabic: Complete B1 Level', description: 'Private lessons', completed: false },
+      ],
+      monthlyGoals: {
+        'January': [],
+        'February': [
+          { id: 1, title: 'Quran: Memorise Last Two Juzz', description: 'Daily practice', completed: false, month: 'February', score: 0 },
+          { id: 2, title: 'Arabic: Finish Mustawa 3', description: 'Complete exam', completed: false, month: 'February', score: 0 },
+        ],
+        'March': [],
+        'April': [],
+        'May': [],
+        'June': [],
+        'July': [],
+        'August': [],
+        'September': [],
+        'October': [],
+        'November': [],
+        'December': [],
+      },
+      monthlyScores: {
+        'January': 0,
+        'February': 0,
+        'March': 0,
+        'April': 0,
+        'May': 0,
+        'June': 0,
+        'July': 0,
+        'August': 0,
+        'September': 0,
+        'October': 0,
+        'November': 0,
+        'December': 0,
+      }
+    },
+    2: {
+      userId: 2,
+      yearlyGoals: [
+        { id: 1, title: 'Quran: Memorize Juzz 30', description: 'Daily practice', completed: false },
+        { id: 2, title: 'Business: Launch new product', description: 'Mande shoes', completed: false },
+      ],
+      monthlyGoals: {
+        'January': [],
+        'February': [],
+        'March': [],
+        'April': [],
+        'May': [],
+        'June': [],
+        'July': [],
+        'August': [],
+        'September': [],
+        'October': [],
+        'November': [],
+        'December': [],
+      },
+      monthlyScores: {
+        'January': 0,
+        'February': 0,
+        'March': 0,
+        'April': 0,
+        'May': 0,
+        'June': 0,
+        'July': 0,
+        'August': 0,
+        'September': 0,
+        'October': 0,
+        'November': 0,
+        'December': 0,
+      },
+      businesses: [
+        {
+          id: 1,
+          name: 'Mande',
+          tasks: [
+            { id: 1, title: 'Meet with designer', completed: false, isWeekly: true },
+            { id: 2, title: 'Organize marketing plan', completed: false, isWeekly: true },
+          ],
+          monthlyGoals: {
+            'February': [
+              { id: 1, title: 'Launch new shoe line', description: 'Complete product development', completed: false, month: 'February', score: 0 },
+            ],
+          }
+        }
+      ]
+    },
+    3: {
+      userId: 3,
+      yearlyGoals: [
+        { id: 1, title: 'Quran: Memorize Juzz 28-30', description: 'Daily practice', completed: false },
+        { id: 2, title: 'Business: Start AI agency', description: 'Voice AI services', completed: false },
+      ],
+      monthlyGoals: {
+        'January': [],
+        'February': [],
+        'March': [],
+        'April': [],
+        'May': [],
+        'June': [],
+        'July': [],
+        'August': [],
+        'September': [],
+        'October': [],
+        'November': [],
+        'December': [],
+      },
+      monthlyScores: {
+        'January': 0,
+        'February': 0,
+        'March': 0,
+        'April': 0,
+        'May': 0,
+        'June': 0,
+        'July': 0,
+        'August': 0,
+        'September': 0,
+        'October': 0,
+        'November': 0,
+        'December': 0,
+      }
+    }
+  };
+
+  // Initialize data for each user if not already present
+  for (const userId of [1, 2, 3]) {
+    initializeUserDataIfNeeded(userId, sampleData[userId]);
+  }
+};
 
 export default function Home() {
   const [scrollY, setScrollY] = useState(0);
@@ -17,6 +154,14 @@ export default function Home() {
       setScrollY(window.scrollY);
     };
 
+    // Initialize AOS
+    AOS.init({
+      duration: 800,
+      easing: 'ease-out-cubic',
+      once: false,
+      mirror: true
+    });
+
     window.addEventListener('scroll', handleScroll);
     setIsLoaded(true);
     
@@ -24,6 +169,13 @@ export default function Home() {
     setTimeout(() => {
       setIsImageVisible(true);
     }, 500);
+
+    // Initialize app data on first load
+    if (typeof window !== 'undefined') {
+      console.log('Initializing app data...');
+      initializeAppData();
+      console.log('App data initialization complete');
+    }
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
@@ -147,64 +299,187 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Goal Alignment Section - Inspired by first screenshot */}
-      <section className="container mx-auto px-4 py-10 mb-10">
-        <div className="flex flex-col items-center">
-          <div className="breadcrumb mb-2 text-sm text-gray-500">
-            <Link href="/">Spiritual Journey</Link> &gt; <span>Personal Growth</span>
-          </div>
-          
-          <h1 className="text-5xl md:text-7xl font-bold text-center mb-4 tracking-tight">
-            Elevate your spiritual journey
-          </h1>
-          
-          <p className="text-xl md:text-2xl text-center max-w-3xl mb-6">
-            Track your growth, visualize progress, and connect your daily practices to meaningful goals.
-          </p>
-          
-          <div className="flex flex-col sm:flex-row gap-4">
-            <Link 
-              href="/journey" 
-              className="luxury-button bg-gray-900 text-white px-8 py-4 rounded-full hover:bg-gray-800 transition-all"
+      {/* Goal Alignment Section - Hero Section */}
+      <section className="relative py-20 overflow-hidden mb-16">
+        {/* Background Image with Overlay */}
+        <div className="absolute inset-0 w-full h-full z-0">
+          <Image 
+            src="/white-mosque.jpg"
+            alt="Sheikh Zayed Grand Mosque"
+            fill
+            priority
+            style={{ objectFit: 'cover', objectPosition: 'center' }}
+            className="opacity-40"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-primary-900/60 via-primary-800/50 to-primary-600/60 mix-blend-multiply"></div>
+        </div>
+        
+        {/* Decorative Elements */}
+        <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0">
+          <div className="absolute -top-10 -left-10 w-64 h-64 bg-primary-500/10 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute top-1/2 -right-20 w-80 h-80 bg-primary-600/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
+          <div className="absolute -bottom-20 left-1/3 w-72 h-72 bg-secondary-500/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
+        </div>
+        
+        {/* Content Container */}
+        <div className="container mx-auto px-6 relative z-10">
+          <div className="grid md:grid-cols-2 gap-12 items-center min-h-[500px]">
+            {/* Left Content: Breadcrumb and Text */}
+            <div className="flex flex-col" data-aos="fade-right">
+              <div className="breadcrumb mb-3 text-sm text-white/70 flex items-center space-x-2">
+                <Link href="/" className="hover:text-white transition-colors duration-300">Spiritual Journey</Link> 
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+                <span className="text-white/90">Personal Growth</span>
+              </div>
+              
+              <h1 
+                className="text-5xl md:text-6xl font-bold mb-6 text-white tracking-tight leading-tight"
+                style={{
+                  textShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                }}
+              >
+                <span className="inline-block transform transition-all duration-700 hover:translate-y-[-2px] hover:text-primary-300">Elevate</span>
+                <span className="inline-block transform transition-all duration-700 hover:translate-y-[-2px] hover:text-primary-300"> your</span>
+                <span className="inline-block transform transition-all duration-700 hover:translate-y-[-2px] hover:text-primary-300"> spiritual</span>
+                <span className="inline-block transform transition-all duration-700 hover:translate-y-[-2px] hover:text-primary-300"> journey</span>
+              </h1>
+              
+              <p className="text-xl text-white/85 mb-8 leading-relaxed max-w-xl">
+                Track your growth, visualize progress, and connect your daily practices to meaningful goals.
+              </p>
+              
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Link 
+                  href="/journey" 
+                  className="relative overflow-hidden group bg-white/10 backdrop-blur-md border border-white/20 text-white px-8 py-4 rounded-full transition-all duration-300 hover:bg-primary-600 hover:border-primary-600 hover:scale-105 shadow-lg"
+                >
+                  <span className="relative z-10 font-medium">Begin your journey</span>
+                  <span className="absolute inset-0 bg-gradient-to-r from-primary-600 to-primary-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+                </Link>
+                <Link 
+                  href="/trips" 
+                  className="relative overflow-hidden group backdrop-blur-md bg-transparent border-2 border-white/30 text-white px-8 py-4 rounded-full transition-all duration-300 hover:border-white/90 hover:bg-white/10 hover:scale-105 shadow-lg"
+                >
+                  <span className="relative z-10 font-medium">Group trips</span>
+                </Link>
+              </div>
+            </div>
+            
+            {/* Right Content: Decorative Element */}
+            <div 
+              className="hidden md:flex justify-center items-center"
+              data-aos="fade-left"
+              data-aos-delay="200"
             >
-              Begin your journey
-            </Link>
-            <Link 
-              href="/trips" 
-              className="luxury-button border-2 border-gray-300 px-8 py-4 rounded-full hover:border-gray-400 transition-all"
-            >
-              Group trips
-            </Link>
+              <div className="relative w-[400px] h-[400px]">
+                {/* Islamic Geometric Pattern - Animated */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-full h-full rounded-full border-2 border-white/20 animate-spin" style={{animationDuration: '30s'}}></div>
+                  <div className="absolute w-[90%] h-[90%] rounded-full border-2 border-white/15 animate-spin" style={{animationDuration: '25s', animationDirection: 'reverse'}}></div>
+                  <div className="absolute w-[80%] h-[80%] rounded-full border-2 border-white/10 animate-spin" style={{animationDuration: '20s'}}></div>
+                  <div className="absolute w-[70%] h-[70%] rounded-full border-2 border-primary-300/30 animate-spin" style={{animationDuration: '15s', animationDirection: 'reverse'}}></div>
+                  <div className="absolute w-[60%] h-[60%] rounded-full border-2 border-primary-400/40 animate-spin" style={{animationDuration: '10s'}}></div>
+                  
+                  {/* Inner Geometric Elements */}
+                  <div className="absolute w-48 h-48 flex items-center justify-center">
+                    <div className="w-full h-full bg-white/5 backdrop-blur-md rounded-full flex items-center justify-center">
+                      <div className="w-32 h-32 bg-gradient-to-tr from-primary-500/30 to-primary-300/30 rounded-full blur-md animate-pulse"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Alhambra Archway Image - Landscape Rectangle */}
-      <section className="container mx-auto px-4 py-6 mb-10">
-        <div className="relative">
+      {/* Prayer Image with Islamic Text Boxes */}
+      <section className="relative py-20 overflow-hidden mb-16">
+        <div className="container mx-auto px-6">
           <div 
-            className={`w-full aspect-[16/9] rounded-t-2xl overflow-hidden relative shadow-2xl transition-all duration-1000 transform ${isImageVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}
+            className="relative overflow-hidden rounded-xl shadow-xl"
+            data-aos="fade-up"
           >
-            <Image 
-              src="/victoriano-izquierdo-HoevDVvxInw-unsplash.jpg"
-              alt="Alhambra Archway View"
-              fill
-              style={{ objectFit: 'cover', objectPosition: 'center' }}
-              className="transition-transform duration-5000 ease-in-out hover:scale-105"
-              priority
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-          </div>
-          
-          {/* Sophisticated Tab */}
-          <div className="bg-primary-700/90 text-white py-4 px-6 rounded-b-2xl shadow-lg flex items-center justify-between">
-            <div className="flex items-center">
-              <h3 className="arabic-font text-3xl font-bold mr-4">الإخوة</h3>
-              <span className="h-8 w-px bg-white/30 mx-2"></span>
-              <p className="text-lg poppins-light">Cultivating the soul's eternal journey</p>
+            {/* Decorative Luxury Border */}
+            <div className="absolute inset-0 z-0 border-2 border-primary-300/20 rounded-xl"></div>
+            <div className="absolute inset-1 z-0 border border-primary-400/10 rounded-xl"></div>
+            
+            {/* Main Content Grid */}
+            <div className="grid md:grid-cols-2 min-h-[500px]">
+              {/* Left Column - Image */}
+              <div className="relative overflow-hidden rounded-tl-xl rounded-bl-xl">
+                <div className="relative z-0 h-full">
+                  <Image 
+                    src="/person-praying.jpg"
+                    alt="Person praying in an ornate mosque"
+                    fill
+                    style={{ objectFit: 'cover', objectPosition: 'center' }}
+                    className={`transition-all duration-700 ease-in-out ${isImageVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}
+                    priority
+                  />
+                  
+                  {/* Gradient Overlay - Matching Style with Hero Section */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-primary-900/60 via-primary-800/50 to-primary-600/60 mix-blend-multiply"></div>
+                  
+                  {/* Pulsating Overlay - Matching Hero Animation Style */}
+                  <div className="absolute inset-0 bg-primary-500/5 animate-pulse" style={{animationDuration: '3s'}}></div>
+                  <div className="absolute inset-0 bg-primary-600/5 animate-pulse" style={{animationDuration: '5s'}}></div>
+                </div>
+              </div>
+              
+              {/* Right Column - Text Boxes */}
+              <div className="flex flex-col bg-white rounded-tr-xl rounded-br-xl shadow-lg">
+                {/* Box 1 - Top */}
+                <div className="flex-1 border-b border-primary-200/30 p-6 md:p-8 animate-pulse" style={{animationDuration: '4s'}}>
+                  <div className="flex items-center mb-4">
+                    <div className="h-px w-6 bg-gradient-to-r from-transparent to-primary-300"></div>
+                    <div className="px-4">
+                      <h3 className="arabic-font text-primary-700 text-2xl font-bold" dir="rtl">باب اليقين والتوكل</h3>
+                    </div>
+                    <div className="h-px flex-grow bg-gradient-to-l from-transparent to-primary-300"></div>
+                  </div>
+                  <p className="text-right text-lg leading-relaxed text-gray-700 arabic-font" dir="rtl">
+                    عن أبي هريرة رضي الله عنه عن النبي صلى الله عليه وسلم قال‏:‏ ‏ "‏يدخل الجنة أقوام أفئدتهم مثل أفئدة الطير‏"
+                  </p>
+                  <div className="mt-3 flex justify-end">
+                    <span className="text-primary-600 text-sm poppins-light">—رواه مسلم</span>
+                  </div>
+                </div>
+                
+                {/* Box 2 - Bottom */}
+                <div className="flex-1 p-6 md:p-8 animate-pulse" style={{animationDuration: '5s'}}>
+                  <div className="flex items-center mb-4">
+                    <div className="h-px w-6 bg-gradient-to-r from-transparent to-primary-300"></div>
+                    <div className="px-4">
+                      <h3 className="arabic-font text-primary-700 text-2xl font-bold" dir="rtl">كتاب الدعوات</h3>
+                    </div>
+                    <div className="h-px flex-grow bg-gradient-to-l from-transparent to-primary-300"></div>
+                  </div>
+                  <p className="text-right text-lg leading-relaxed text-gray-700 arabic-font" dir="rtl">
+                    قَالَ قَالَ رَسُولُ اللَّهِ صلى الله عليه وسلم ‏ "‏ إِنَّ حُسْنَ الظَّنِّ بِاللَّهِ مِنْ حُسْنِ عِبَادَةِ اللَّهِ ‏"
+                  </p>
+                  <div className="mt-3 flex justify-end">
+                    <span className="text-primary-600 text-sm poppins-light">—رواه أبو داود</span>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="bg-white/20 px-4 py-2 rounded-full text-sm backdrop-blur-sm">
-              Sacred Architecture
+            
+            {/* Bottom Caption */}
+            <div className="bg-white py-4 px-6 md:px-8 border-t border-primary-200/30 text-center">
+              <div className="flex items-center justify-center mb-2">
+                <div className="h-px w-12 bg-gradient-to-r from-transparent to-primary-300"></div>
+                <div className="px-4">
+                  <span className="arabic-font text-primary-600 text-xl">رحلة روحية</span>
+                </div>
+                <div className="h-px w-12 bg-gradient-to-l from-transparent to-primary-300"></div>
+              </div>
+              <p className="text-center text-gray-600 leading-relaxed max-w-2xl mx-auto">
+                In the stillness of prayer and contemplation, we connect with our higher purpose.
+                These sacred moments ground us, allowing the soul to reflect and align with divine guidance on our spiritual journey.
+              </p>
             </div>
           </div>
         </div>

@@ -1,16 +1,4 @@
 {
-  "app/dashboard/page.tsx -> @/components/UserDashboard": {
-    "id": "app/dashboard/page.tsx -> @/components/UserDashboard",
-    "files": [
-      "static/chunks/_app-pages-browser_src_components_UserDashboard_tsx.js"
-    ]
-  },
-  "app/dashboard/page.tsx -> @/components/UserSelector": {
-    "id": "app/dashboard/page.tsx -> @/components/UserSelector",
-    "files": [
-      "static/chunks/_app-pages-browser_src_components_UserSelector_tsx.js"
-    ]
-  },
   "components/ProgressTracker.tsx -> chart.js": {
     "id": "components/ProgressTracker.tsx -> chart.js",
     "files": [
@@ -33,6 +21,18 @@
     "id": "components/UserDashboard.tsx -> react-chartjs-2",
     "files": [
       "static/chunks/_app-pages-browser_node_modules_react-chartjs-2_dist_index_js.js"
+    ]
+  },
+  "components/UserSelectionPage.tsx -> @/components/AbdullahiLogo": {
+    "id": "components/UserSelectionPage.tsx -> @/components/AbdullahiLogo",
+    "files": [
+      "static/chunks/_app-pages-browser_src_components_AbdullahiLogo_tsx.js"
+    ]
+  },
+  "components/UserSelectionPage.tsx -> @/components/ZakariyaLogo": {
+    "id": "components/UserSelectionPage.tsx -> @/components/ZakariyaLogo",
+    "files": [
+      "static/chunks/_app-pages-browser_src_components_ZakariyaLogo_tsx.js"
     ]
   }
 }
