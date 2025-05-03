@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Logo from '@/components/Logo';
 import UserSelector from '@/components/UserSelector';
@@ -15,7 +15,7 @@ const USERS = [
   { id: 3, name: 'Abdullahi', color: 'primary' },
 ];
 
-export default function Dashboard() {
+function DashboardContent() {
   const searchParams = useSearchParams();
   const userIdParam = searchParams?.get('userId');
   const [selectedUserId, setSelectedUserId] = useState<number | null>(
@@ -76,9 +76,17 @@ export default function Dashboard() {
         <UserDashboard 
           userId={selectedUserId} 
           userName={selectedUser.name} 
-          key={`dashboard-${selectedUserId}`} // Force re-mount when user changes
+          key={`dashboard-${selectedUserId}`} 
         />
       )}
     </div>
+  );
+}
+
+export default function Dashboard() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center min-h-screen">Loading...</div>}>
+      <DashboardContent />
+    </Suspense>
   );
 } 
